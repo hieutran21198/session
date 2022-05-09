@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/hieutran21198/session/internal/model"
 	"github.com/hieutran21198/session/internal/session"
@@ -11,9 +12,10 @@ import (
 )
 
 var (
-	sessionType = flag.String("type", "aws2fa", "get session by type")
-	profile     = flag.String("profile", "$HOME/.fish_profile_$USER", "profile name")
-	shell       = flag.String("shell", string(model.Fish), "profile type")
+	sessionType  = flag.String("type", "aws2fa", "get session by type")
+	profile      = flag.String("profile", "$HOME/.fish_profile_$USER", "profile name")
+	shell        = flag.String("shell", string(model.Fish), "profile type")
+	arnMFADevice = flag.String("amd", "", "set ARN MFA Device to env variable")
 )
 
 func main() {
@@ -22,6 +24,20 @@ func main() {
 	pshell := model.ProfileShellType(*shell)
 
 	sessSrv := session.New()
+
+	*arnMFADevice = strings.TrimSpace(*arnMFADevice)
+	if *arnMFADevice != "" {
+		os.Setenv("ARN_MFA_DEVICE", *arnMFADevice)
+		fileContents := []string{}
+		if pshell == model.Fish {
+			fileContents = append(fileContents, fmt.Sprintf("set -gx ARN_MFA_DEVICE %s", *arnMFADevice))
+		}
+
+		if pshell == model.Zsh || pshell == model.Bash {
+			fileContents = append(fileContents, fmt.Sprintf("export ARN_MFA_DEVICE=%s", *arnMFADevice))
+		}
+		util.SaveToProfile(*profile, fileContents, "#BEGIN_AWS_ARN_MFA_DEVICE", "#END_AWS_ARN_MFA_DEVICE", true)
+	}
 
 	switch *sessionType {
 	case "aws2fa":
