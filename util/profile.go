@@ -6,6 +6,55 @@ import (
 	"strings"
 )
 
+// DeleteContent deletes the content inside prefix and suffix.
+func DeleteContent(f string, prefix, suffix string) {
+	file, err := os.Open(f)
+	if err != nil {
+		panic(err)
+	}
+
+	defer file.Close()
+
+	cb, err := ioutil.ReadAll(file)
+	if err != nil {
+		panic(err)
+	}
+
+	fileLine := strings.Split(string(cb), "\n")
+	beginAt := -1
+	endAt := -1
+
+	for i, line := range fileLine {
+		if beginAt == -1 && strings.TrimSpace(line) == prefix {
+			beginAt = i
+		}
+
+		if endAt == -1 && strings.TrimSpace(line) == suffix {
+			endAt = i
+		}
+
+		if beginAt != -1 && endAt != -1 {
+			break
+		}
+	}
+
+	if beginAt == -1 && endAt == -1 {
+		return
+	}
+
+	if beginAt == -1 && endAt != -1 {
+		panic("invalid openning prefix")
+	}
+
+	if beginAt != -1 && endAt == -1 {
+		panic("invalid closing suffix")
+	}
+
+	fileLine = append(fileLine[:beginAt], fileLine[endAt+1:]...)
+
+	writeToFile(f, fileLine)
+}
+
 // Append prefix and suffix to the profile.
 func appendPrefixSuffix(profile string, prefix string, suffix string) {
 	file, err := os.Open(profile)
