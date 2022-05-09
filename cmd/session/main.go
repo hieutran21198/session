@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hieutran21198/aws-session/internal/model"
-	"github.com/hieutran21198/aws-session/internal/session"
-	"github.com/hieutran21198/aws-session/util"
+	"github.com/hieutran21198/session/internal/model"
+	"github.com/hieutran21198/session/internal/session"
+	"github.com/hieutran21198/session/util"
 )
 
 var (

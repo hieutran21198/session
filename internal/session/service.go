@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hieutran21198/aws-session/util"
+	"github.com/hieutran21198/session/util"
 )
 
 type service struct {
