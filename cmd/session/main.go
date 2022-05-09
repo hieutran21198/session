@@ -35,10 +35,12 @@ var (
 	// AWS MFA session, it is used to get the session token. It uses action keys (AWSMFA,...) as the value.
 	sessionType = flag.String("type", string(AWSMFA), "get session by type")
 
-	arnMFADevice = flag.String("amd", "", "set ARN MFA Device to env variable")
+	awsamd = flag.String("aws-amd", "", "set ARN MFA Device to env variable")
 
+	// clean content, it is used to clean the content of the profile.
 	cleanContent = flag.String("clean", "", "clean profile")
-	pshell       model.ProfileShellType
+
+	pshell model.ProfileShellType
 
 	profileBlocks = map[ActionKey]*block{
 		AWSMFA: {
@@ -67,28 +69,24 @@ func getBlockWithHeaderTag(key ActionKey) *block {
 func main() {
 	flag.Parse()
 	*profile = os.ExpandEnv(*profile)
-	*arnMFADevice = strings.TrimSpace(*arnMFADevice)
+	*awsamd = strings.TrimSpace(*awsamd)
 	pshell = model.ProfileShellType(*shell)
 
 	if *cleanContent != "" {
-		clean()
+		clean(ActionKey(*cleanContent))
 		return
 	}
 
-	if *arnMFADevice != "" {
-		setArnMFADevice()
+	if *awsamd != "" {
+		setAWSAMD()
 	}
 
 	setSession()
 }
 
-func clean() {
-	block := getBlockWithHeaderTag(ActionKey(*cleanContent))
-
-	switch *cleanContent {
-	case string(AWSMFA):
-		util.DeleteContent(*profile, block.prefix, block.suffix)
-	}
+func clean(ak ActionKey) {
+	b := getBlockWithHeaderTag(ak)
+	util.DeleteContent(*profile, b.prefix, b.suffix)
 }
 
 func setSession() {
@@ -123,16 +121,16 @@ func setAWSSessionMFA(sessSrv session.Service) {
 	util.SaveToProfile(*profile, fileContents, block.prefix, block.suffix, true)
 }
 
-func setArnMFADevice() {
-	os.Setenv("ARN_MFA_DEVICE", *arnMFADevice)
+func setAWSAMD() {
+	os.Setenv("ARN_MFA_DEVICE", *awsamd)
 
 	fileContents := []string{}
 	if pshell == model.Fish {
-		fileContents = append(fileContents, fmt.Sprintf("set -gx ARN_MFA_DEVICE %s", *arnMFADevice))
+		fileContents = append(fileContents, fmt.Sprintf("set -gx ARN_MFA_DEVICE %s", *awsamd))
 	}
 
 	if pshell == model.Zsh || pshell == model.Bash {
-		fileContents = append(fileContents, fmt.Sprintf("export ARN_MFA_DEVICE=%s", *arnMFADevice))
+		fileContents = append(fileContents, fmt.Sprintf("export ARN_MFA_DEVICE=%s", *awsamd))
 	}
 
 	block := getBlockWithHeaderTag(AWSAMD)
