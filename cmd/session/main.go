@@ -32,6 +32,12 @@ func main() {
 			fileContents = append(fileContents, fmt.Sprintf("set -gx AWS_SECRET_ACCESS_KEY %s", sess.Credentials.SecretAccessKey))
 			fileContents = append(fileContents, fmt.Sprintf("set -gx AWS_SESSION_TOKEN %s", sess.Credentials.SessionToken))
 		}
+		if pshell == model.Zsh || pshell == model.Bash {
+			fileContents = append(fileContents, fmt.Sprintf("export AWS_ACCESS_KEY_ID=%s", sess.Credentials.AccessKeyId))
+			fileContents = append(fileContents, fmt.Sprintf("export AWS_SECRET_ACCESS_KEY=%s", sess.Credentials.SecretAccessKey))
+			fileContents = append(fileContents, fmt.Sprintf("export AWS_SESSION_TOKEN=%s", sess.Credentials.SessionToken))
+		}
+
 		util.SaveToProfile(*profile, fileContents, "#BEGIN_AWS_2FA_SESSION", "#END_AWS_2FA_SESSION", true)
 	default:
 		panic("unknown session type")
