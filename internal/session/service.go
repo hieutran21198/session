@@ -13,17 +13,17 @@ type service struct {
 
 // Service is the interface for the session service.
 type Service interface {
-	GetAWSSession2FA() *AWSSession2FA
+	GetAWSSessionMFA() *AWSSessionMFA
 }
 
 // New creates a new session service.
-func New() *service {
+func New() Service {
 	return &service{}
 }
 
-// GetAWSSession2FA gets the AWS session with 2FA.
-func (s *service) GetAWSSession2FA() *AWSSession2FA {
-	sess := &AWSSession2FA{}
+// GetAWSSessionMFA gets the AWS session with MFA.
+func (s *service) GetAWSSessionMFA() *AWSSessionMFA {
+	sess := &AWSSessionMFA{}
 
 	var tokenStr string
 	fmt.Println("Token from registered device:")

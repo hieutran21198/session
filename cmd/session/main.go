@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	sessionType  = flag.String("type", "aws2fa", "get session by type")
+	sessionType  = flag.String("type", "aws_mfa", "get session by type")
 	profile      = flag.String("profile", "$HOME/.fish_profile_$USER", "profile name")
 	shell        = flag.String("shell", string(model.Fish), "profile type")
 	arnMFADevice = flag.String("amd", "", "set ARN MFA Device to env variable")
@@ -40,8 +40,8 @@ func main() {
 	}
 
 	switch *sessionType {
-	case "aws2fa":
-		sess := sessSrv.GetAWSSession2FA()
+	case "aws_mfa":
+		sess := sessSrv.GetAWSSessionMFA()
 		fileContents := []string{}
 		if pshell == model.Fish {
 			fileContents = append(fileContents, fmt.Sprintf("set -gx AWS_ACCESS_KEY_ID %s", sess.Credentials.AccessKeyId))
@@ -54,7 +54,7 @@ func main() {
 			fileContents = append(fileContents, fmt.Sprintf("export AWS_SESSION_TOKEN=%s", sess.Credentials.SessionToken))
 		}
 
-		util.SaveToProfile(*profile, fileContents, "#BEGIN_AWS_2FA_SESSION", "#END_AWS_2FA_SESSION", true)
+		util.SaveToProfile(*profile, fileContents, "#BEGIN_AWS_MFA_SESSION", "#END_AWS_MFA_SESSION", true)
 	default:
 		panic("unknown session type")
 	}

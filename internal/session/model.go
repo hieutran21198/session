@@ -2,7 +2,7 @@ package session
 
 import "time"
 
-// AWSSession2FA is a 2FA session for AWS.
+// AWSSessionMFA is a MFA session for AWS.
 /*
 example:
 {
@@ -18,7 +18,7 @@ QxETx5vrsjHfvCHMYURc89x2HgHFTr1rgAvw/IVo=",
     }
 }
 */
-type AWSSession2FA struct {
+type AWSSessionMFA struct {
 	Credentials struct {
 		AccessKeyId     string    `json:"AccessKeyId"`
 		SecretAccessKey string    `json:"SecretAccessKey"`
